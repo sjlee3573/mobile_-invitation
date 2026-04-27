@@ -747,7 +747,7 @@
     label.style.cssText = `
       font-family: 'Noto Serif KR', serif; font-size: 11px; font-weight: 300;
       color: #b76e79; letter-spacing: 0.05em; white-space: nowrap;
-      opacity: 0.85; pointer-events: none;`;
+      opacity: 0.9; pointer-events: none; display: block;`;
 
     // 래퍼로 묶기
     const wrap = document.createElement('div');
