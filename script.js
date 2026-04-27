@@ -739,15 +739,21 @@
   }
 
   function toggleBGM() {
-    if (!bgmAudio) return;
-    if (bgmPlaying) {
-      bgmAudio.pause();
-      bgmPlaying = false;
-    } else {
-      bgmAudio.play().then(() => { bgmPlaying = true; }).catch(() => {});
-    }
+  if (!bgmAudio) return;
+
+  if (bgmPlaying) {
+    bgmAudio.pause();
+    bgmPlaying = false;
     updateBGMIcon();
+  } else {
+    bgmAudio.play()
+      .then(() => {
+        bgmPlaying = true;
+        updateBGMIcon();
+      })
+      .catch(() => {});
   }
+}
 
   function updateBGMIcon() {
     const iconOn  = document.getElementById('bgm-icon-on');
