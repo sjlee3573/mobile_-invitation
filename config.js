@@ -95,4 +95,12 @@ const CONFIG = {
     title: "이승진 ♥ 이여림 결혼합니다",
     description: "2025년 5월 17일 토요일 오후 12시 30분, 르비르모어",
   },
+
+  // config.js에 추가
+  bgm: {
+    enabled: true,
+    src: 'music/toyou_short.mp3',   // 파일 경로 (mp3, ogg, wav 모두 가능)
+    loop: true,
+    volume: 0.5,            // 0.0 ~ 1.0
+  },
 };

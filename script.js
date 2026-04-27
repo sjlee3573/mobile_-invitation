@@ -73,6 +73,9 @@
       }
       // Start petals immediately since there's no curtain to open
       initPetals();
+      // BGM은 커튼 없을 때 첫 클릭/터치 시 재생 시도
+      document.addEventListener('click', () => playBGM(), { once: true });
+      document.addEventListener('touchstart', () => playBGM(), { once: true, passive: true });
       return;
     }
 
@@ -89,6 +92,7 @@
         document.body.style.overflow = '';
         setTimeout(() => curtain.classList.add('is-hidden'), 1400);
         initPetals();
+        playBGM();
       });
     }
     document.body.style.overflow = 'hidden';
@@ -678,10 +682,86 @@
     animate();
   }
 
+  /* ── BGM ── */
+  let bgmAudio = null;
+  let bgmPlaying = false;
+
+  function initBGM() {
+    const cfg = CONFIG.bgm;
+    if (!cfg || cfg.enabled === false || !cfg.src) return;
+
+    bgmAudio = new Audio(cfg.src);
+    bgmAudio.loop = cfg.loop !== false;
+    bgmAudio.volume = cfg.volume !== undefined ? cfg.volume : 0.5;
+
+    // 플로팅 버튼 생성
+    const btn = document.createElement('button');
+    btn.id = 'bgm-btn';
+    btn.setAttribute('aria-label', '음악 켜기/끄기');
+    btn.innerHTML = `
+      <svg id="bgm-icon-on" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      </svg>
+      <svg id="bgm-icon-off" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+      </svg>`;
+    btn.style.cssText = `
+      position: fixed; bottom: 24px; right: 20px; z-index: 900;
+      width: 44px; height: 44px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,0.88); backdrop-filter: blur(6px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #b76e79; transition: transform 0.15s, box-shadow 0.15s;`;
+    btn.addEventListener('pointerover', () => { btn.style.transform = 'scale(1.1)'; });
+    btn.addEventListener('pointerout',  () => { btn.style.transform = 'scale(1)'; });
+    btn.addEventListener('click', toggleBGM);
+    document.body.appendChild(btn);
+
+    // 탭 숨김/복귀 처리
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        bgmAudio.pause();
+      } else if (bgmPlaying) {
+        bgmAudio.play().catch(() => {});
+      }
+    });
+  }
+
+  function playBGM() {
+    if (!bgmAudio || bgmPlaying) return;
+    bgmAudio.play().then(() => {
+      bgmPlaying = true;
+      updateBGMIcon();
+    }).catch(() => {});
+  }
+
+  function toggleBGM() {
+    if (!bgmAudio) return;
+    if (bgmPlaying) {
+      bgmAudio.pause();
+      bgmPlaying = false;
+    } else {
+      bgmAudio.play().then(() => { bgmPlaying = true; }).catch(() => {});
+    }
+    updateBGMIcon();
+  }
+
+  function updateBGMIcon() {
+    const iconOn  = document.getElementById('bgm-icon-on');
+    const iconOff = document.getElementById('bgm-icon-off');
+    if (!iconOn || !iconOff) return;
+    iconOn.style.display  = bgmPlaying ? '' : 'none';
+    iconOff.style.display = bgmPlaying ? 'none' : '';
+  }
+
   /* ── Init ── */
   async function init() {
     // Synchronous inits (no image dependency)
     initMeta();
+    initBGM();
     initCurtain();
     initHero();
     initCountdown();
