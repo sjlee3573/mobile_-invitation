@@ -372,8 +372,11 @@
     viewer.classList.add('is-active');
     viewer.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    viewer.addEventListener('touchmove', _blockScroll, { passive: false });
     goToSlide(viewerIdx, false);
   }
+
+  function _blockScroll(e) { e.preventDefault(); }
 
   function closeViewer() {
     const viewer = $('#viewer');
@@ -381,6 +384,7 @@
     viewer.classList.remove('is-active');
     viewer.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    viewer.removeEventListener('touchmove', _blockScroll);
   }
 
   function goToSlide(idx, animate = true) {
@@ -436,8 +440,11 @@
     const track = $('#viewer-track');
     if (!track) return;
 
+    let touchStartY = 0;
+
     track.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
       touchDeltaX = 0;
       isSwiping = true;
       track.style.transition = 'none';
@@ -445,10 +452,11 @@
 
     track.addEventListener('touchmove', (e) => {
       if (!isSwiping) return;
+      e.preventDefault(); // 세로 스크롤 방지
       touchDeltaX = e.touches[0].clientX - touchStartX;
       const offset = -(viewerIdx * window.innerWidth) + touchDeltaX;
       track.style.transform = `translateX(${offset}px)`;
-    }, { passive: true });
+    }, { passive: false });
 
     track.addEventListener('touchend', () => {
       if (!isSwiping) return;
