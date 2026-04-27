@@ -101,6 +101,6 @@ const CONFIG = {
     enabled: true,
     src: 'music/toyou_short.mp3',   // 파일 경로 (mp3, ogg, wav 모두 가능)
     loop: true,
-    volume: 0.5,            // 0.0 ~ 1.0
+    volume: 0.2,            // 0.0 ~ 1.0
   },
 };

@@ -407,8 +407,22 @@
 
     $('#viewer-close')?.addEventListener('click', closeViewer);
     viewer.querySelector('.viewer__backdrop')?.addEventListener('click', closeViewer);
-    $('#viewer-prev')?.addEventListener('click', () => goToSlide(viewerIdx - 1));
-    $('#viewer-next')?.addEventListener('click', () => goToSlide(viewerIdx + 1));
+
+    // 더블클릭/더블탭 확대 방지
+    const preventZoom = (e) => e.preventDefault();
+    const prevBtn = $('#viewer-prev');
+    const nextBtn = $('#viewer-next');
+
+    if (prevBtn) {
+      prevBtn.style.touchAction = 'manipulation';
+      prevBtn.addEventListener('click', () => goToSlide(viewerIdx - 1));
+      prevBtn.addEventListener('dblclick', preventZoom);
+    }
+    if (nextBtn) {
+      nextBtn.style.touchAction = 'manipulation';
+      nextBtn.addEventListener('click', () => goToSlide(viewerIdx + 1));
+      nextBtn.addEventListener('dblclick', preventZoom);
+    }
 
     // Keyboard
     document.addEventListener('keydown', (e) => {
@@ -709,16 +723,33 @@
         <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
       </svg>`;
     btn.style.cssText = `
-      position: fixed; bottom: 24px; right: 20px; z-index: 900;
       width: 44px; height: 44px; border-radius: 50%; border: none;
       background: rgba(255,255,255,0.88); backdrop-filter: blur(6px);
       box-shadow: 0 2px 12px rgba(0,0,0,0.18); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      color: #b76e79; transition: transform 0.15s, box-shadow 0.15s;`;
+      color: #b76e79; transition: transform 0.15s, box-shadow 0.15s; flex-shrink: 0;`;
     btn.addEventListener('pointerover', () => { btn.style.transform = 'scale(1.1)'; });
     btn.addEventListener('pointerout',  () => { btn.style.transform = 'scale(1)'; });
     btn.addEventListener('click', toggleBGM);
-    document.body.appendChild(btn);
+
+    // "piano by 여림" 레이블
+    const label = document.createElement('span');
+    label.id = 'bgm-label';
+    label.textContent = 'piano by 여림';
+    label.style.cssText = `
+      font-family: 'Noto Serif KR', serif; font-size: 11px; font-weight: 300;
+      color: #b76e79; letter-spacing: 0.05em; white-space: nowrap;
+      opacity: 0.85; pointer-events: none;`;
+
+    // 래퍼로 묶기
+    const wrap = document.createElement('div');
+    wrap.id = 'bgm-wrap';
+    wrap.style.cssText = `
+      position: fixed; bottom: 24px; right: 20px; z-index: 900;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;`;
+    wrap.appendChild(label);
+    wrap.appendChild(btn);
+    document.body.appendChild(wrap);
 
     // 탭 숨김/복귀 처리
     document.addEventListener('visibilitychange', () => {
