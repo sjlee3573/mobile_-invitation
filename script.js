@@ -330,11 +330,14 @@
 
     grid.innerHTML = galleryImages
       .map(
-        (src, i) => `
+        (src, i) => {
+          const thumb = src.replace('images/gallery/', 'images/gallery/thumb/');
+          return `
       <div class="gallery__item" data-index="${i}">
-        <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async" />
+        <img src="${thumb}" alt="갤러리 사진 ${i + 1}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
-    `
+    `;
+        }
       )
       .join('');
 
