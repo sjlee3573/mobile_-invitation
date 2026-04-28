@@ -19,33 +19,35 @@
   let galleryImages = [];
 
   function loadImagesFromFolder(folder, maxAttempts = 50) {
+    // 먼저 순차 탐색으로 총 개수 파악 (3연속 실패 시 종료)
+    // 이후 실제 존재하는 경로만 병렬로 미리 로드
     return new Promise(resolve => {
-        const images = [];
-        let current = 1;
-        let consecutiveFails = 0;
+      const found = [];
+      let current = 1;
+      let consecutiveFails = 0;
 
-        function tryNext() {
-            if (current > maxAttempts || consecutiveFails >= 3) {
-                resolve(images);
-                return;
-            }
-            const img = new Image();
-            const path = `images/${folder}/${current}.jpg`;
-            img.onload = function() {
-                images.push(path);
-                consecutiveFails = 0;
-                current++;
-                tryNext();
-            };
-            img.onerror = function() {
-                consecutiveFails++;
-                current++;
-                tryNext();
-            };
-            img.src = path;
+      function discover() {
+        if (current > maxAttempts || consecutiveFails >= 3) {
+          resolve(found);
+          return;
         }
+        const path = `images/${folder}/${current}.jpg`;
+        const img = new Image();
+        img.onload = () => {
+          found.push(path);
+          consecutiveFails = 0;
+          current++;
+          discover();
+        };
+        img.onerror = () => {
+          consecutiveFails++;
+          current++;
+          discover();
+        };
+        img.src = path;
+      }
 
-        tryNext();
+      discover();
     });
   }
 
@@ -330,7 +332,7 @@
       .map(
         (src, i) => `
       <div class="gallery__item" data-index="${i}">
-        <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="lazy" />
+        <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
     `
       )
@@ -359,15 +361,18 @@
     const track = $('#viewer-track');
     if (!viewer || !track || galleryImages.length === 0) return;
 
-    track.innerHTML = galleryImages
-      .map(
-        (src) => `
-      <div class="viewer__slide">
-        <img src="${src}" alt="" loading="lazy" />
-      </div>
-    `
-      )
-      .join('');
+    // 이미 슬라이드가 생성돼 있으면 재사용 (매번 재삽입 방지)
+    if (!track.children.length) {
+      track.innerHTML = galleryImages
+        .map(
+          (src, i) => `
+        <div class="viewer__slide">
+          <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="lazy" decoding="async" />
+        </div>
+      `
+        )
+        .join('');
+    }
 
     viewer.classList.add('is-active');
     viewer.setAttribute('aria-hidden', 'false');
