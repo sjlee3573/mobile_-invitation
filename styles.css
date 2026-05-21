@@ -715,6 +715,14 @@ a {
   border-radius: 12px;
 }
 
+.root_daum_roughmap {
+  width: 100% !important;
+}
+.root_daum_roughmap iframe {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 
 
 
@@ -870,7 +878,7 @@ a {
 /* ── Footer ── */
 .footer {
   text-align: center;
-  padding: 40px 24px calc(40px + var(--safe-bottom));
+  padding: 5px 24px calc(40px + var(--safe-bottom));
   background: linear-gradient(
     180deg,
     var(--ivory) 0%,
@@ -1205,11 +1213,7 @@ a {
   .story__images {
     max-width: 500px;
   }
-  .root_daum_roughmap,
-  .root_daum_roughmap iframe {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
+
 
 }
 /* ── Transport Info ── */
