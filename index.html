@@ -46,6 +46,8 @@
 
   <!-- ========== Main ========== -->
   <main class="invitation">
+  <p class="curtain__msg" id="version-info" style="display:none">v2.5</p>
+  <script>if(new URLSearchParams(location.search).has("dev")) document.getElementById("version-info").style.display="";</script>
     <!-- ── Hero Section ── -->
     <section class="section hero" id="hero">
       <div class="floral-frame">
@@ -162,11 +164,47 @@
         <h2 class="section__title script-font">Location</h2>
         <p class="location__venue" id="loc-venue"></p>
         <p class="location__hall" id="loc-hall"></p>
-        <p class="location__address" id="loc-address"></p>
-        <p class="location__tel" id="loc-tel"></p>
+        <!-- <p class="location__address" id="loc-address"></p>
+        <p class="location__tel" id="loc-tel"></p> -->
         <div class="location__map-wrap">
-          <img id="loc-map-img" src="" alt="오시는 길" loading="lazy" />
+          <div id="daumRoughmapContainer1779339285296"  class="root_daum_roughmap root_daum_roughmap_landing"></div>
+          <script charset="UTF-8" class="daum_roughmap_loader_script" src="https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js"></script>
+          <script charset="UTF-8">
+            new daum.roughmap.Lander({
+              "timestamp" : "1779339285296",
+		          "key" : "nritphvmt53",
+              "mapWidth" : "640",
+              "mapHeight" : "230"
+            }).render();
+          </script>
         </div>
+        <div class="location__transport">
+          <div class="transport__item">
+            <span class="transport__icon">🚇</span>
+            <div class="transport__info">
+              <p class="transport__title">지하철</p>
+              <p class="transport__desc">2호선 &amp; 수인·분당선 선릉역 1번출구 도보 1분</p>
+            </div>
+          </div>
+          <div class="transport__item">
+            <span class="transport__icon">🚌</span>
+            <div class="transport__info">
+              <p class="transport__title">버스</p>
+              <p class="transport__desc">선릉역 정류장 하차 후 도보 2분</p>
+              <p class="transport__desc transport__desc--small">[간선] 146, 333, 341, 360, 740</p>
+              <p class="transport__desc transport__desc--small">[광역] 1100, 1700, 2000, 7007, 9303</p>
+            </div>
+          </div>
+          <div class="transport__item">
+            <span class="transport__icon">🚗</span>
+            <div class="transport__info">
+              <p class="transport__title">자가용</p>
+              <p class="transport__desc">건물 내 무료주차 2시간</p>
+              <p class="transport__desc transport__desc--small">초과 시 10분당 1,000원</p>
+            </div>
+          </div>
+        </div>
+
         <div class="location__buttons">
           <button class="btn btn--rose" id="btn-copy-address">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
