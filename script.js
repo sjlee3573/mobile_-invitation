@@ -19,33 +19,47 @@
   let galleryImages = [];
 
   function loadImagesFromFolder(folder, maxAttempts = 50) {
+    // config에 갤러리 수가 명시된 경우 병렬 로딩
+    if (folder === 'gallery' && CONFIG.gallery && CONFIG.gallery.count) {
+      const count = CONFIG.gallery.count;
+      const paths = Array.from({ length: count }, (_, i) => `images/gallery/${i + 1}.jpg`);
+      const promises = paths.map(path => new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(path);
+        img.onerror = () => resolve(null);
+        img.src = path;
+      }));
+      return Promise.all(promises).then(results => results.filter(Boolean));
+    }
+
+    // 기본: 순차 탐색 (hero, story, location 등)
     return new Promise(resolve => {
-        const images = [];
-        let current = 1;
-        let consecutiveFails = 0;
+      const images = [];
+      let current = 1;
+      let consecutiveFails = 0;
 
-        function tryNext() {
-            if (current > maxAttempts || consecutiveFails >= 3) {
-                resolve(images);
-                return;
-            }
-            const img = new Image();
-            const path = `images/${folder}/${current}.jpg`;
-            img.onload = function() {
-                images.push(path);
-                consecutiveFails = 0;
-                current++;
-                tryNext();
-            };
-            img.onerror = function() {
-                consecutiveFails++;
-                current++;
-                tryNext();
-            };
-            img.src = path;
+      function tryNext() {
+        if (current > maxAttempts || consecutiveFails >= 3) {
+          resolve(images);
+          return;
         }
+        const img = new Image();
+        const path = `images/${folder}/${current}.jpg`;
+        img.onload = function () {
+          images.push(path);
+          consecutiveFails = 0;
+          current++;
+          tryNext();
+        };
+        img.onerror = function () {
+          consecutiveFails++;
+          current++;
+          tryNext();
+        };
+        img.src = path;
+      }
 
-        tryNext();
+      tryNext();
     });
   }
 
@@ -328,11 +342,14 @@
 
     grid.innerHTML = galleryImages
       .map(
-        (src, i) => `
+        (src, i) => {
+          const thumb = src.replace('images/gallery/', 'images/gallery/thumb/');
+          return `
       <div class="gallery__item" data-index="${i}">
-        <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="lazy" />
+        <img src="${thumb}" alt="갤러리 사진 ${i + 1}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
-    `
+    `;
+        }
       )
       .join('');
 

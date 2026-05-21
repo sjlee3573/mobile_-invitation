@@ -103,4 +103,7 @@ const CONFIG = {
     loop: true,
     volume: 0.1,            // 0.0 ~ 1.0
   },
+  gallery: {
+    count: 27,
+  },
 };
