@@ -19,35 +19,33 @@
   let galleryImages = [];
 
   function loadImagesFromFolder(folder, maxAttempts = 50) {
-    // 먼저 순차 탐색으로 총 개수 파악 (3연속 실패 시 종료)
-    // 이후 실제 존재하는 경로만 병렬로 미리 로드
     return new Promise(resolve => {
-      const found = [];
-      let current = 1;
-      let consecutiveFails = 0;
+        const images = [];
+        let current = 1;
+        let consecutiveFails = 0;
 
-      function discover() {
-        if (current > maxAttempts || consecutiveFails >= 3) {
-          resolve(found);
-          return;
+        function tryNext() {
+            if (current > maxAttempts || consecutiveFails >= 3) {
+                resolve(images);
+                return;
+            }
+            const img = new Image();
+            const path = `images/${folder}/${current}.jpg`;
+            img.onload = function() {
+                images.push(path);
+                consecutiveFails = 0;
+                current++;
+                tryNext();
+            };
+            img.onerror = function() {
+                consecutiveFails++;
+                current++;
+                tryNext();
+            };
+            img.src = path;
         }
-        const path = `images/${folder}/${current}.jpg`;
-        const img = new Image();
-        img.onload = () => {
-          found.push(path);
-          consecutiveFails = 0;
-          current++;
-          discover();
-        };
-        img.onerror = () => {
-          consecutiveFails++;
-          current++;
-          discover();
-        };
-        img.src = path;
-      }
 
-      discover();
+        tryNext();
     });
   }
 
@@ -86,7 +84,7 @@
     const btn = $('#curtain-open');
     if (names) {
       names.textContent =
-        CONFIG.groom.fullName + ' & ' + CONFIG.bride.fullName;
+        CONFIG.groom.fullName + ' ♥ ' + CONFIG.bride.fullName;
     }
     if (btn) {
       btn.addEventListener('click', () => {
@@ -109,7 +107,7 @@
     if (names) {
       names.innerHTML =
         CONFIG.groom.fullName +
-        ' <span class="ampersand">&amp;</span> ' +
+        ' <span class="ampersand">♥</span> ' +
         CONFIG.bride.fullName;
     }
 
@@ -330,14 +328,11 @@
 
     grid.innerHTML = galleryImages
       .map(
-        (src, i) => {
-          const thumb = src.replace('images/gallery/', 'images/gallery/thumb/');
-          return `
+        (src, i) => `
       <div class="gallery__item" data-index="${i}">
-        <img src="${thumb}" alt="갤러리 사진 ${i + 1}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async" />
+        <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="lazy" />
       </div>
-    `;
-        }
+    `
       )
       .join('');
 
@@ -364,27 +359,21 @@
     const track = $('#viewer-track');
     if (!viewer || !track || galleryImages.length === 0) return;
 
-    // 이미 슬라이드가 생성돼 있으면 재사용 (매번 재삽입 방지)
-    if (!track.children.length) {
-      track.innerHTML = galleryImages
-        .map(
-          (src, i) => `
-        <div class="viewer__slide">
-          <img src="${src}" alt="갤러리 사진 ${i + 1}" loading="lazy" decoding="async" />
-        </div>
-      `
-        )
-        .join('');
-    }
+    track.innerHTML = galleryImages
+      .map(
+        (src) => `
+      <div class="viewer__slide">
+        <img src="${src}" alt="" loading="lazy" />
+      </div>
+    `
+      )
+      .join('');
 
     viewer.classList.add('is-active');
     viewer.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    viewer.addEventListener('touchmove', _blockScroll, { passive: false });
     goToSlide(viewerIdx, false);
   }
-
-  function _blockScroll(e) { e.preventDefault(); }
 
   function closeViewer() {
     const viewer = $('#viewer');
@@ -392,7 +381,6 @@
     viewer.classList.remove('is-active');
     viewer.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    viewer.removeEventListener('touchmove', _blockScroll);
   }
 
   function goToSlide(idx, animate = true) {
@@ -419,22 +407,8 @@
 
     $('#viewer-close')?.addEventListener('click', closeViewer);
     viewer.querySelector('.viewer__backdrop')?.addEventListener('click', closeViewer);
-
-    // 더블클릭/더블탭 확대 방지
-    const preventZoom = (e) => e.preventDefault();
-    const prevBtn = $('#viewer-prev');
-    const nextBtn = $('#viewer-next');
-
-    if (prevBtn) {
-      prevBtn.style.touchAction = 'manipulation';
-      prevBtn.addEventListener('click', () => goToSlide(viewerIdx - 1));
-      prevBtn.addEventListener('dblclick', preventZoom);
-    }
-    if (nextBtn) {
-      nextBtn.style.touchAction = 'manipulation';
-      nextBtn.addEventListener('click', () => goToSlide(viewerIdx + 1));
-      nextBtn.addEventListener('dblclick', preventZoom);
-    }
+    $('#viewer-prev')?.addEventListener('click', () => goToSlide(viewerIdx - 1));
+    $('#viewer-next')?.addEventListener('click', () => goToSlide(viewerIdx + 1));
 
     // Keyboard
     document.addEventListener('keydown', (e) => {
@@ -448,11 +422,8 @@
     const track = $('#viewer-track');
     if (!track) return;
 
-    let touchStartY = 0;
-
     track.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
       touchDeltaX = 0;
       isSwiping = true;
       track.style.transition = 'none';
@@ -460,11 +431,10 @@
 
     track.addEventListener('touchmove', (e) => {
       if (!isSwiping) return;
-      e.preventDefault(); // 세로 스크롤 방지
       touchDeltaX = e.touches[0].clientX - touchStartX;
       const offset = -(viewerIdx * window.innerWidth) + touchDeltaX;
       track.style.transform = `translateX(${offset}px)`;
-    }, { passive: false });
+    }, { passive: true });
 
     track.addEventListener('touchend', () => {
       if (!isSwiping) return;
@@ -739,33 +709,16 @@
         <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
       </svg>`;
     btn.style.cssText = `
+      position: fixed; bottom: 24px; right: 20px; z-index: 900;
       width: 44px; height: 44px; border-radius: 50%; border: none;
       background: rgba(255,255,255,0.88); backdrop-filter: blur(6px);
       box-shadow: 0 2px 12px rgba(0,0,0,0.18); cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      color: #b76e79; transition: transform 0.15s, box-shadow 0.15s; flex-shrink: 0;`;
+      color: #b76e79; transition: transform 0.15s, box-shadow 0.15s;`;
     btn.addEventListener('pointerover', () => { btn.style.transform = 'scale(1.1)'; });
     btn.addEventListener('pointerout',  () => { btn.style.transform = 'scale(1)'; });
     btn.addEventListener('click', toggleBGM);
-
-    // "piano by 여림" 레이블
-    const label = document.createElement('span');
-    label.id = 'bgm-label';
-    label.textContent = 'piano by 여림';
-    label.style.cssText = `
-      font-family: 'Noto Serif KR', serif; font-size: 11px; font-weight: 300;
-      color: #b76e79; letter-spacing: 0.05em; white-space: nowrap;
-      opacity: 0.9; pointer-events: none; display: block;`;
-
-    // 래퍼로 묶기
-    const wrap = document.createElement('div');
-    wrap.id = 'bgm-wrap';
-    wrap.style.cssText = `
-      position: fixed; bottom: 24px; right: 20px; z-index: 900;
-      display: flex; flex-direction: column; align-items: center; gap: 5px;`;
-    wrap.appendChild(label);
-    wrap.appendChild(btn);
-    document.body.appendChild(wrap);
+    document.body.appendChild(btn);
 
     // 탭 숨김/복귀 처리
     document.addEventListener('visibilitychange', () => {
