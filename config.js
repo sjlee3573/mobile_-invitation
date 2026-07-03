@@ -43,7 +43,9 @@ const CONFIG = {
     time: "12:30",             // HH:MM (24시간)
     dayOfWeek: "토요일",
     venue: "르비르모어",
-    hall: "2층 웨딩홀",
+    hall: "웨딩홀: 2층",
+    banquet: "연회장: 1층",
+    banquet_info: "식사 가능한 시간: 12:00~14:30",
     address: "서울시 강남구 테헤란로 406 A동(선릉역 1번출구)",
     tel: "02-501-7000",
     mapLinks: {
@@ -73,8 +75,8 @@ const CONFIG = {
   accounts: {
     groom: [
       { role: "신랑", name: "이승진", bank: "카카오뱅크", number: "3333-04-5343509" },
-      { role: "아버지", name: "이계명", bank: "국민은행", number: "준비중" },
-      { role: "어머니", name: "김차숙", bank: "우리은행", number: "준비중" },
+      { role: "아버지", name: "이계명", bank: "국민은행", number: "559-21-0354-423" },
+      { role: "어머니", name: "김차숙", bank: "농협은행", number: "352-0401-8737-23" },
     ],
     bride: [
       { role: "신부", name: "이여림", bank: "카카오뱅크", number: "3333-19-8364767" },

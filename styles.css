@@ -695,6 +695,16 @@ a {
 .location__hall {
   font-size: 0.9rem;
   color: var(--text-light);
+}
+
+.location__banquet {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.location__banquet_info {
+  font-size: 0.9rem;
+  color: var(--text-light);
   margin-bottom: 12px;
 }
 

@@ -472,12 +472,16 @@
     const w = CONFIG.wedding;
     const venue = $('#loc-venue');
     const hall = $('#loc-hall');
+    const banquet = $('#loc-banquet');
+    const banquet_info = $('#loc-banquet_info');
     const addr = $('#loc-address');
     const tel = $('#loc-tel');
     const mapImg = $('#loc-map-img');
 
     if (venue) venue.textContent = w.venue;
     if (hall) hall.textContent = w.hall;
+    if (banquet) banquet.textContent = w.banquet;
+    if (banquet_info) banquet_info.textContent = w.banquet_info;
     if (addr) addr.textContent = w.address;
     if (tel) tel.textContent = `Tel. ${w.tel}`;
     if (mapImg) mapImg.src = 'images/location/1.jpg';
