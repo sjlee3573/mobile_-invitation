@@ -9,7 +9,7 @@
  *    images/story/1.jpg ...  — 스토리 사진 (자동 감지)
  *    images/gallery/1.jpg ...— 갤러리 사진 (자동 감지)
  *    images/location/1.jpg   — 오시는 길 사진 (1장)
- *    images/og/1.jpg         — OG 공유 썸네일 (1장)
+ *    images/og/1.jpg         — OG 공유 썸네일 (1장) 
  * ============================================
  */
 
