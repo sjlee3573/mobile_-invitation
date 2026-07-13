@@ -724,7 +724,7 @@
 
     const label = document.createElement('span');
     label.id = 'bgm-label';
-    label.textContent = 'piano by 여림';
+    label.textContent = 'Piano by 여림';
     label.style.cssText = `
       font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
       font-style: italic; font-size: 11px; letter-spacing: 0.02em;
