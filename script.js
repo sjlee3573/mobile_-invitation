@@ -715,7 +715,24 @@
     bgmAudio.loop = cfg.loop !== false;
     bgmAudio.volume = cfg.volume !== undefined ? cfg.volume : 0.5;
 
-    // 플로팅 버튼 생성
+    // 플로팅 버튼 + 라벨 wrapper 생성
+    const bgmWrap = document.createElement('div');
+    bgmWrap.id = 'bgm-wrap';
+    bgmWrap.style.cssText = `
+      position: fixed; bottom: 24px; right: 20px; z-index: 900;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;`;
+
+    const label = document.createElement('span');
+    label.id = 'bgm-label';
+    label.textContent = 'piano by 여림';
+    label.style.cssText = `
+      font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
+      font-style: italic; font-size: 11px; letter-spacing: 0.02em;
+      color: #b76e79; background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(6px); padding: 2px 10px; border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.1); white-space: nowrap;
+      pointer-events: none; user-select: none;`;
+
     const btn = document.createElement('button');
     btn.id = 'bgm-btn';
     btn.setAttribute('aria-label', '음악 켜기/끄기');
@@ -730,7 +747,6 @@
         <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
       </svg>`;
     btn.style.cssText = `
-      position: fixed; bottom: 24px; right: 20px; z-index: 900;
       width: 44px; height: 44px; border-radius: 50%; border: none;
       background: rgba(255,255,255,0.88); backdrop-filter: blur(6px);
       box-shadow: 0 2px 12px rgba(0,0,0,0.18); cursor: pointer;
@@ -739,7 +755,10 @@
     btn.addEventListener('pointerover', () => { btn.style.transform = 'scale(1.1)'; });
     btn.addEventListener('pointerout',  () => { btn.style.transform = 'scale(1)'; });
     btn.addEventListener('click', toggleBGM);
-    document.body.appendChild(btn);
+
+    bgmWrap.appendChild(label);
+    bgmWrap.appendChild(btn);
+    document.body.appendChild(bgmWrap);
 
     // 탭 숨김/복귀 처리
     document.addEventListener('visibilitychange', () => {
