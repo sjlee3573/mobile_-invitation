@@ -523,7 +523,7 @@
     document.addEventListener('click', (e) => {
       const copyBtn = e.target.closest('.account-item__copy');
       if (copyBtn) {
-        const account = copyBtn.dataset.account;
+        const account = copyBtn.dataset.account.replace(/\D/g, '');
         copyToClipboard(account, '계좌번호가 복사되었습니다');
       }
     });
@@ -541,7 +541,7 @@
             ${acc.bank} ${acc.number}
           </p>
         </div>
-        <button class="account-item__copy" data-account="${acc.bank} ${acc.number} ${acc.name}">복사</button>
+        <button class="account-item__copy" data-account="${acc.number}">복사</button>
       </div>
     `
       )
